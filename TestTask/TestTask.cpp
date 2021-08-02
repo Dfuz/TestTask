@@ -1,123 +1,78 @@
-﻿#ifdef _WIN32
-	#include <Windows.h>
-#endif 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
-#include <iostream>
-
+﻿#include <iostream>
 #include "TestTask.h"
 
-using namespace std;
+class MyDrawable : public glfwm::Drawable {
+public:
+    void draw(const glfwm::WindowID id) override
+    {
+        std::cout << "Drawing window " << id << std::endl;
+    }
+};
+std::shared_ptr<MyDrawable> myDrawable;
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+class MyHandler;
+std::shared_ptr<MyHandler> myHandler;
+
+class MyHandler : public glfwm::EventHandler {
+public:
+    glfwm::EventBaseType getHandledEventTypes() const override
+    {
+        return static_cast<glfwm::EventBaseType>(glfwm::EventType::MOUSE_BUTTON);
+    }
+
+    bool handle(const glfwm::EventPointer& e) override
+    {
+        if (e->getEventType() == glfwm::EventType::MOUSE_BUTTON) {
+
+            std::shared_ptr<glfwm::EventMouseButton> mb = std::dynamic_pointer_cast<glfwm::EventMouseButton>(e);
+
+            if (mb->getAction() != glfwm::ActionType::RELEASE)
+                return false;
+
+            glfwm::WindowPointer win = glfwm::Window::getWindow(e->getWindowID());
+            int w, h, x, y;
+            win->getSize(w, h);
+            win->getPosition(x, y);
+
+            if (mb->getMouseButton() == glfwm::MouseButtonType::MOUSE_BUTTON_LEFT) {
+                glfwm::WindowPointer newWin = glfwm::WindowManager::createWindow(w * 0.9, h * 0.9, std::string(), getHandledEventTypes());
+                newWin->setTitle(std::string("Window ") + std::to_string(newWin->getID()) + std::string(". Built from ") + std::to_string(e->getWindowID()));
+                newWin->setPosition(x + w * 0.1, y + h * 0.1);
+                newWin->bindEventHandler(myHandler, 0);
+                newWin->bindDrawable(myDrawable, 0);
+                glfwm::WindowGroupPointer grp = glfwm::WindowGroup::getGroup(glfwm::WindowGroup::getWindowGroup(e->getWindowID()));
+                if (grp)
+                    grp->attachWindow(newWin->getID());
+                return true;
+            }
+            else if (mb->getMouseButton() == glfwm::MouseButtonType::MOUSE_BUTTON_RIGHT) {
+                win->setShouldClose(true);
+                return true;
+            }
+            return false;
+        }
+
+        return false;
+    }
+};
+
+
+
+int main(int argc, char* argv[])
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
-void draw_heptagon() 
-{
-	glBegin(GL_TRIANGLES);
-	glVertex3f(-0.6f, 0.8f, -5.0f);
-	glVertex3f(0.0f, 1.0f, -5.0f);
-	glVertex3f(0.6f, 0.8f, -5.0f);
-	glEnd();
-	glBegin(GL_QUADS);
-	glVertex3f(0.6f, 0.8f, -5.0f);
-	glVertex3f(0.8f, 0.4f, -5.0f);
-	glVertex3f(-0.8f, 0.4f, -5.0f);
-	glVertex3f(-0.6f, 0.8f, -5.0f);
-	glEnd();
+    glfwm::WindowManager::init();
+    glfwm::WindowManager::setHint(GLFW_CLIENT_API, GLFW_NO_API);
+    myHandler = std::make_shared<MyHandler>();
+    myDrawable = std::make_shared<MyDrawable>();
+    glfwm::WindowPointer mainWin = glfwm::WindowManager::createWindow(800, 600, std::string(), myHandler->getHandledEventTypes());
+    mainWin->setTitle(std::string("Main Window ") + std::to_string(mainWin->getID()));
+    mainWin->bindEventHandler(myHandler, 0);
+    mainWin->bindDrawable(myDrawable, 0);
+    glfwm::WindowGroupPointer grp = glfwm::WindowGroup::newGroup();
+    grp->attachWindow(mainWin->getID());
+    grp->runLoopConcurrently();
+    glfwm::WindowManager::mainLoop();
+    glfwm::WindowManager::terminate();
 
-	glBegin(GL_QUADS);
-	glVertex3f(0.8f, 0.4f, -5.0f);
-	glVertex3f(0.6f, 0.0f, -5.0f);
-	glVertex3f(-0.6f, 0.0f, -5.0f);
-	glVertex3f(-0.8f, 0.4f, -5.0f);
-	glEnd();
-}
-
-//Initializes 3D rendering
-void initializeRendering()
-{
-	glfwInit();
-	//Makes 3D drawing work when something is in front of something else
-	glEnable(GL_DEPTH_TEST);
-}
-
-int main()
-{
-	if (!glfwInit())
-	{
-		// Initialization failed
-		cout << "Initialization failed!" << endl;
-		return 1;
-	}
-	else cout << "Hello GLFW!" << endl;
-	glEnable(GL_DEPTH_TEST);
-
-	GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
-	if (!window)
-	{
-		// Window or OpenGL context creation failed
-		cout << "Window or OpenGL context creation failed!" << endl;
-		return 1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(20);
-	glfwSetKeyCallback(window, key_callback);
-	while (!glfwWindowShouldClose(window))
-	{
-		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
-		glViewport(0, 0, width, height);
-		//
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //clear background screen to black
-
-		//Clear information from last draw
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glMatrixMode(GL_MODELVIEW); //Switch to the drawing perspective
-		glLoadIdentity(); //Reset the drawing perspective
-
-		glBegin(GL_QUADS); //Begin quadrilateral coordinates
-
-		//Trapezoid
-		glVertex3f(-0.7f, -1.5f, -5.0f);
-		glVertex3f(0.7f, -1.5f, -5.0f);
-		glVertex3f(0.4f, -0.5f, -5.0f);
-		glVertex3f(-0.4f, -0.5f, -5.0f);
-
-		glEnd(); //End quadrilateral coordinates
-
-		glBegin(GL_TRIANGLES); //Begin triangle coordinates
-
-		//Pentagon
-		glVertex3f(0.5f, 0.5f, -5.0f);
-		glVertex3f(1.5f, 0.5f, -5.0f);
-		glVertex3f(0.5f, 1.0f, -5.0f);
-
-		glVertex3f(0.5f, 1.0f, -5.0f);
-		glVertex3f(1.5f, 0.5f, -5.0f);
-		glVertex3f(1.5f, 1.0f, -5.0f);
-
-		glVertex3f(0.5f, 1.0f, -5.0f);
-		glVertex3f(1.5f, 1.0f, -5.0f);
-		glVertex3f(1.0f, 1.5f, -5.0f);
-
-		//Triangle
-		glVertex3f(-0.5f, 0.5f, -5.0f);
-		glVertex3f(-1.0f, 1.5f, -5.0f);
-		glVertex3f(-1.5f, 0.5f, -5.0f);
-
-		glEnd(); //End triangle coordinates
-		//
-
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	exit(EXIT_SUCCESS);
+    return 0;
 }

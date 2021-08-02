@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <GLFWM/glfwm.hpp>
 
 struct IShape
 {
@@ -8,12 +9,7 @@ struct IShape
 	virtual void setScale(double scale) = 0;
 };
 
-struct IMovable
-{
-	virtual void setSpeed(double rotateSpeed) = 0;
-};
-
-class Dot : public IShape, public IMovable
+class Dot : public IShape, public glfwm::Drawable
 {
 
 };

@@ -12,5 +12,9 @@ find_package(OpenGL REQUIRED)
 # Add source to this project's executable.
 add_executable (TestTask "TestTask.cpp" "TestTask.h")
 
-target_link_libraries(TestTask glfw OpenGL::GL)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON)
+
+target_link_libraries(TestTask glfwm OpenGL::GL)
 # TODO: Add tests and install targets if needed.
