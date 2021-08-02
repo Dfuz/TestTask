@@ -1,8 +1,20 @@
-﻿// TestTask.h : Include file for standard system include files,
-// or project specific include files.
+﻿#pragma once
 
-#pragma once
+class IShape
+{
+	public: virtual bool fillColor(float RED, float GREEN, float BLUE) = 0;
+	public:	virtual void setPosition(float X, float Y) const = 0;
+	public:	virtual void rotateShape(float angle) = 0;
+};
 
-#include <iostream>
+class IMovable
+{
 
-// TODO: Reference additional headers your program requires here.
+};
+
+class Dot : public IShape
+{
+
+};
+
+
