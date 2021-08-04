@@ -4,6 +4,7 @@
 #include <list>
 #include <GLFWM/glfwm.hpp>
 
+using std::initializer_list;
 using std::array;
 using std::pair;
 using std::list;
@@ -50,14 +51,38 @@ protected:
 	array<pair<float, float>, VertexCount> _coords;
 	float _scale;
 public:
-	DrawableShape(int InitX = 0, int InitY = 0, 
-		float red = 0.f, float green = 0.f, float blue = 0.f, 
-		float scale = 0.f);
+	DrawableShape(int InitX = 0, int InitY = 0,
+		float red = 0.f, float green = 0.f, float blue = 0.f,
+		float scale = 0.f) 
+		: Location(InitX, InitY),
+		_red(red), _green(green), _blue(blue),
+		_scale(scale) 
+	{};
+	DrawableShape(DrawableShape&&) = default;
+	DrawableShape& operator=(DrawableShape&&) = default;
 	~DrawableShape() {}
-	void setColor(float RED, float GREEN, float BLUE) override;
-	void setScale(double scale) override;
+	void setColor(float RED, float GREEN, float BLUE) override
+	{
+		_red = RED;
+		_green = GREEN;
+		_blue = BLUE;
+	}
+	void setScale(double scale) override { _scale = scale; }
+	bool setVertex(initializer_list<pair<float, float>> initList)
+	{
+		if (initList.size() != VertexCount) return false;
+		for (size_t i = 0; i < initList.size(); i++)
+		{
+			_coords[i] = initList[;
+		}
+		return true;
+	}
+	DrawableShape& operator=(const initializer_list<int>& rhs)
+	{
+		setVertex(rhs);
+		return *this;
+	}
 };
-
 
 class Rectangle : public DrawableShape<1>
 {
