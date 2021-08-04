@@ -15,7 +15,7 @@ using std::list;
 struct IShape
 {
 	virtual void setColor(float RED, float GREEN, float BLUE) = 0;
-	virtual void moveTo(float X, float Y) const = 0;
+	virtual void moveTo(float offsetX, float offsetY) = 0;
 	virtual void rotateShape(float angle) = 0;
 	virtual void setScale(double scale) = 0;
 	virtual ~IShape() {}
@@ -58,8 +58,6 @@ public:
 		_red(red), _green(green), _blue(blue),
 		_scale(scale) 
 	{};
-	DrawableShape(DrawableShape&&) = default;
-	DrawableShape& operator=(DrawableShape&&) = default;
 	~DrawableShape() {}
 	void setColor(float RED, float GREEN, float BLUE) override
 	{
@@ -71,24 +69,40 @@ public:
 	bool setVertex(initializer_list<pair<float, float>> initList)
 	{
 		if (initList.size() != VertexCount) return false;
+		auto iterator = initList.begin();
 		for (size_t i = 0; i < initList.size(); i++)
 		{
-			_coords[i] = initList[;
+			_coords[i] = *iterator++;
 		}
 		return true;
 	}
-	DrawableShape& operator=(const initializer_list<int>& rhs)
+	void operator=(const initializer_list<pair<float, float>>& rhs)
 	{
 		setVertex(rhs);
-		return *this;
 	}
 };
 
+/// <summary>
+/// Simple rectangle
+/// </summary>
 class Rectangle : public DrawableShape<1>
 {
 public:
+	Rectangle(int InitX = 0, int InitY = 0,
+		float red = 0.f, float green = 0.f, float blue = 0.f,
+		float scale = 0.f)
+		: DrawableShape<1>(InitX, InitY, red, green, blue, scale)
+	{};
 	void draw(const glfwm::WindowID id) override;
 	void rotateShape(float angle) override;
-	void moveTo(float X, float Y) const override;
+	void moveTo(float X, float Y) override;
+};
+
+class Paralelogram : public Rectangle
+{
+private:
+	float angle = 0;
+public:
+	void setAngle(float radians) { angle = radians; }
 };
 

@@ -1,7 +1,5 @@
 ﻿#include "TestTask.h"
 
-using glfwm::WindowManager;
-using glfwm::Window;
 /*-----------------------------------------------------------------------*/
 /*                     CLASS METHODS Location                            */
 /*-----------------------------------------------------------------------*/
@@ -56,7 +54,15 @@ void Rectangle::rotateShape(float angle)
 	return;
 }
 
-void Rectangle::moveTo(float X, float Y) const
+void Rectangle::moveTo(float offsetX, float offsetY)
 {
+	_x += offsetX;
+	_y += offsetY;
+
+	for (auto& [x, y] : _coords)
+	{
+		x += offsetX;
+		y += offsetY;
+	}
 	return;
 }
