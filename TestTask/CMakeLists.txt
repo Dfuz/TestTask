@@ -12,10 +12,10 @@ find_package(OpenGL REQUIRED)
 option(WITH_MULTITHREADING "Build GLFWM with multithreading facilities (i.e. thread-safe) or not." OFF)
 
 # Add source to this project's executable.
-add_executable (TestTask "TestTask.cpp" "TestTask.h" "EventHandlers.h")
+add_executable (TestTask "TestTask.cpp" "TestTask.h" "EventHandlers.h" "Main.cpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 11
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(TestTask glfwm OpenGL::GL)

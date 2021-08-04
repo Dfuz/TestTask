@@ -1,35 +1,69 @@
 ﻿#pragma once
+#include <vector>
+#include <array>
+#include <list>
 #include <GLFWM/glfwm.hpp>
 
+using std::array;
+using std::pair;
+using std::list;
+
+/// <summary>
+/// Interface for abstract shape
+/// </summary>
 struct IShape
 {
-	virtual bool fillColor(float RED, float GREEN, float BLUE) = 0;
-	virtual void setPosition(float X, float Y) const = 0;
+	virtual void setColor(float RED, float GREEN, float BLUE) = 0;
+	virtual void moveTo(float X, float Y) const = 0;
 	virtual void rotateShape(float angle) = 0;
 	virtual void setScale(double scale) = 0;
+	virtual ~IShape() {}
 };
 
-class Dot : public glfwm::Drawable
+/// <summary>
+/// Class-helper
+/// </summary>
+class Location
 {
-	void draw(const glfwm::WindowID id) override
-	{
-		auto window = glfwm::Window::getWindow(id);
-		int width = 0, height = 0;
-		window->getSize(width, height);
-		glViewport(0, 0, width, height);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0.0, width, 0.0, height, 0.0, 1.0); // this creates a canvas you can do 2D drawing on
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glPointSize(10);
-		glLineWidth(4.5);
-		glColor3f(0.0, 1.0, 0.0);
-		glBegin(GL_LINES);
-		glVertex3f(10.0, 10.0, 0.0);
-		glVertex3f(200.0, 200.0, 0.0);
-		glEnd();
-	}
+protected: 
+	GLfloat _x;
+	GLfloat _y;
+public:
+	Location(int InitX = 0, int InitY = 0);
+	~Location() {};
+	int getX();
+	int getY();
 };
 
+/// <summary>
+/// Abstract-class:
+/// 1. void draw(const glfwm::WindowID id) and
+/// 2. void rotateShape(float Angle)
+/// 3. void moveTo(float, float)
+/// are pure virtual functions and must be implemented
+/// </summary>
+template<size_t VertexCount>
+class DrawableShape : public Location, public IShape, public glfwm::Drawable
+{
+protected:
+	GLfloat _red, _green, _blue;
+	array<pair<float, float>, VertexCount> _coords;
+	float _scale;
+public:
+	DrawableShape(int InitX = 0, int InitY = 0, 
+		float red = 0.f, float green = 0.f, float blue = 0.f, 
+		float scale = 0.f);
+	~DrawableShape() {}
+	void setColor(float RED, float GREEN, float BLUE) override;
+	void setScale(double scale) override;
+};
+
+
+class Rectangle : public DrawableShape<1>
+{
+public:
+	void draw(const glfwm::WindowID id) override;
+	void rotateShape(float angle) override;
+	void moveTo(float X, float Y) const override;
+};
 

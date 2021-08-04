@@ -1,30 +1,103 @@
-﻿#include <iostream>
-#include "TestTask.h"
-#include "EventHandlers.h"
+﻿#include "TestTask.h"
 
 using glfwm::WindowManager;
 using glfwm::Window;
+/*-----------------------------------------------------------------------*/
+/*                     CLASS METHODS Location                            */
+/*-----------------------------------------------------------------------*/
+Location::Location(int InitX, int InitY)
+	: _x(InitX), _y(InitY)
+{}
 
-int main(int argc, char* argv[])
+int Location::getX()
 {
-    WindowManager::init();
-    auto myDrawable = std::make_shared<Dot>();
-    auto myHandler = std::make_shared<ResizeHandler>();
-    auto mainWin = glfwm::WindowManager::createWindow(800, 600, std::string(), myHandler->getHandledEventTypes());
-    mainWin->setTitle(std::string("Main Window ") + std::to_string(mainWin->getID()));
+	return _x;
+}
 
-    // center window
-    int mx = 0, my = 0;
-    int wx = 0, wy = 0;
-    mainWin->getSize(wx, wy);
-    glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), nullptr, nullptr, &mx, &my);
-    mainWin->setPosition((mx - wx) / 2, (my - wy) / 2);
+int Location::getY()
+{
+	return _y;
+}
 
-    // bind events and drawable objects
-    mainWin->bindEventHandler(myHandler, 0);
-    mainWin->bindDrawable(myDrawable, 0);
-    glfwm::WindowManager::mainLoop();
-    glfwm::WindowManager::terminate();
+/*-----------------------------------------------------------------------*/
+/*                     CLASS METHODS DrawableShape                       */
+/*-----------------------------------------------------------------------*/
+template<size_t VertexCount>
+DrawableShape<VertexCount>::DrawableShape(int InitX, int InitY,
+		 float red, float green, float blue, 
+		 float scale)
+	: Location(InitX, InitY),
+	_red(red), _green(green), _blue(blue),
+	_scale(scale)
+{
+	_coords.resize(1);
+}
 
-    return 0;
+//template<size_t VertexCount>
+//void DrawableShape<VertexCount>::draw(const glfwm::WindowID id)
+//{
+//	const auto window = glfwm::Window::getWindow(id);
+//	int width = 0, height = 0;
+//	window->getSize(width, height);
+//	glViewport(0, 0, width, height);
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//	glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
+//	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	glPointSize(10);
+//	glLineWidth(_scale);
+//	glColor3f(0.0, 1.0, 0.0);
+//	glBegin(GL_POINTS);
+//	//glVertex3f(00.0, 00.0, 0.0);
+//	glVertex3f(width, height, 0.0);
+//	glEnd();
+//}
+
+template<size_t VertexCount>
+void DrawableShape<VertexCount>::setScale(double scale)
+{
+	_scale = scale;
+}
+
+template<size_t VertexCount>
+void DrawableShape<VertexCount>::setColor(float RED, float GREEN, float BLUE)
+{
+	_red = RED;
+	_green = GREEN;
+	_blue = BLUE;
+}
+
+/*-----------------------------------------------------------------------*/
+/*                     CLASS METHODS DrawableShape                       */
+/*-----------------------------------------------------------------------*/
+void Rectangle::draw(const glfwm::WindowID id)
+{
+		const auto window = glfwm::Window::getWindow(id);
+		int width = 0, height = 0;
+		window->getSize(width, height);
+		glViewport(0, 0, width, height);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glPointSize(10);
+		glLineWidth(_scale);
+		glColor3f(0.0, 1.0, 0.0);
+		glBegin(GL_QUADS);
+		glVertex3f(_x, _y, 0.f);
+		const auto& [axisX, axisY] = _coords[0];
+;		glVertex3f(axisX, axisY, 0.f);
+		glEnd();
+}
+
+void Rectangle::rotateShape(float angle)
+{
+	return;
+}
+
+void Rectangle::moveTo(float X, float Y) const
+{
+	return;
 }
