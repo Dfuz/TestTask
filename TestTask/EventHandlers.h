@@ -32,14 +32,22 @@ public:
 			if (drawableShape)
 			{
 				auto castedEventPtr = std::dynamic_pointer_cast<glfwm::EventKey>(e);
-				if (castedEventPtr->getKey() == KeyType::KEY_RIGHT)
+
+				switch (castedEventPtr->getKey())
+				{
+				case KeyType::KEY_RIGHT:
 					drawableShape->moveTo(2, 0);
-				else if (castedEventPtr->getKey() == KeyType::KEY_UP)
+					break;
+				case KeyType::KEY_UP:
 					drawableShape->moveTo(0, 2);
-				else if (castedEventPtr->getKey() == KeyType::KEY_DOWN)
+					break;
+				case KeyType::KEY_DOWN:
 					drawableShape->moveTo(0, -2);
-				else if (castedEventPtr->getKey() == KeyType::KEY_LEFT)
+					break;
+				case KeyType::KEY_LEFT:
 					drawableShape->moveTo(-2, 0);
+					break;
+				}
 				return true;
 			}
 			return false;
