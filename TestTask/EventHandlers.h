@@ -20,15 +20,10 @@ public:
 			auto castedEventPtr = std::dynamic_pointer_cast<glfwm::EventWindowSize>(e);
 			auto window = glfwm::Window::getWindow(e->getWindowID());
 			window->setTitle("Window has been resized");
-			return true;
-		}
-		else if (e->getEventType() == glfwm::EventType::FRAMEBUFFERSIZE)
-		{
-			auto window = glfwm::Window::getWindow(e->getWindowID());			
 			window->draw();
 			window->swapBuffers();
 			return true;
 		}
-	   else return false;
+		else return false;
 	}
 };
