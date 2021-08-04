@@ -9,8 +9,10 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 find_package(OpenGL REQUIRED)
 
+option(WITH_MULTITHREADING "Build GLFWM with multithreading facilities (i.e. thread-safe) or not." OFF)
+
 # Add source to this project's executable.
-add_executable (TestTask "TestTask.cpp" "TestTask.h")
+add_executable (TestTask "TestTask.cpp" "TestTask.h" "EventHandlers.h")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 11
