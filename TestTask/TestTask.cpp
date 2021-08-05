@@ -46,7 +46,8 @@ void Circle::draw(const glfwm::WindowID id)
 	for (size_t i = 0; i < 360; ++i)
 	{
 		auto theta = i * RadiansConstant;
-		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
+		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), 
+				  (static_cast<GLfloat>(_y + _radius * sin(theta))));
 	}
 	glEnd();
 }
@@ -60,7 +61,8 @@ void Ring::draw(const glfwm::WindowID id)
 	for (size_t i = 0; i < 360; ++i)
 	{
 		auto theta = i * RadiansConstant;
-		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
+		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), 
+				  (static_cast<GLfloat>(_y + _radius * sin(theta))));
 	}
 	glEnd();
 
