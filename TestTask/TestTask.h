@@ -37,10 +37,8 @@ public:
 
 /// <summary>
 /// Abstract-class:
-/// 1. void draw(const glfwm::WindowID id) and
-/// 2. void rotateShape(float Angle)
-/// 3. void moveTo(float, float)
-/// are pure virtual functions and must be implemented
+/// void draw(const glfwm::WindowID id)
+/// are pure virtual function and must be implemented
 /// </summary>
 template<size_t VertexCount>
 class DrawableShape : public Location, public IShape, public glfwm::Drawable
