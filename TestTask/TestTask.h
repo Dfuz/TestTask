@@ -16,7 +16,6 @@ struct IShape
 {
 	virtual void setColor(float RED, float GREEN, float BLUE) = 0;
 	virtual void moveTo(float offsetX, float offsetY) = 0;
-	virtual void rotateShape(float angle) = 0;
 	virtual void setScale(double scale) = 0;
 	virtual ~IShape() {}
 };
@@ -30,10 +29,10 @@ protected:
 	GLfloat _x;
 	GLfloat _y;
 public:
-	Location(int InitX = 0, int InitY = 0);
+	Location(GLfloat InitX = 0, GLfloat InitY = 0);
 	~Location() {};
-	int getX();
-	int getY();
+	GLfloat getX();
+	GLfloat getY();
 };
 
 /// <summary>
@@ -49,9 +48,9 @@ class DrawableShape : public Location, public IShape, public glfwm::Drawable
 protected:
 	GLfloat _red, _green, _blue;
 	array<pair<float, float>, VertexCount> _coords;
-	float _scale;
+	double _scale;
 public:
-	DrawableShape(int InitX = 0, int InitY = 0,
+	DrawableShape(GLfloat InitX = 0, GLfloat InitY = 0,
 		float red = 0.f, float green = 0.f, float blue = 0.f,
 		float scale = 0.f) 
 		: Location(InitX, InitY),
@@ -80,6 +79,18 @@ public:
 	{
 		setVertex(rhs);
 	}
+	void moveTo(float offsetX, float offsetY) override
+	{
+		_x += offsetX;
+		_y += offsetY;
+
+		for (auto& [x, y] : _coords)
+		{
+			x += offsetX;
+			y += offsetY;
+		}
+		return;
+	}
 };
 
 /// <summary>
@@ -88,21 +99,43 @@ public:
 class Rectangle : public DrawableShape<1>
 {
 public:
-	Rectangle(int InitX = 0, int InitY = 0,
+	Rectangle(GLfloat InitX = 0, GLfloat InitY = 0, GLfloat InitX2 = 0, GLfloat InitY2 = 0,
 		float red = 0.f, float green = 0.f, float blue = 0.f,
 		float scale = 0.f)
 		: DrawableShape<1>(InitX, InitY, red, green, blue, scale)
-	{};
+	{
+		_coords[0].first = InitX2;
+		_coords[0].second = InitY2;
+	};
 	void draw(const glfwm::WindowID id) override;
-	void rotateShape(float angle) override;
-	void moveTo(float X, float Y) override;
 };
 
-class Paralelogram : public Rectangle
+class Circle : public DrawableShape<0>
 {
-private:
-	float angle = 0;
+protected:
+	float _radius;
 public:
-	void setAngle(float radians) { angle = radians; }
+	Circle(GLfloat InitX = 0, GLfloat InitY = 0, float radius = 0.f,
+		float red = 0.f, float green = 0.f, float blue = 0.f,
+		float scale = 0.f)
+		: DrawableShape<0>(InitX, InitY, red, green, blue, scale),
+		_radius(radius)
+	{}
+	void draw(const glfwm::WindowID id) override;
+	void setRadius(float radius) { _radius = radius; }
 };
 
+class Ring : public Circle
+{
+protected:
+	float _ringWidth;
+public:
+	Ring(GLfloat InitX = 0, GLfloat InitY = 0, float radius = 0.f, float ringwidth = 1.f,
+		float red = 0.f, float green = 0.f, float blue = 0.f,
+		float scale = 0.f)
+		: Circle(InitX, InitY, radius, red, green, blue, scale),
+		_ringWidth(ringwidth)
+	{}
+	void setRingWidth(float ringwidth) { _ringWidth = ringwidth; }
+	void draw(const glfwm::WindowID id) override;
+};

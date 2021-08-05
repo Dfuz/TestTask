@@ -1,18 +1,20 @@
-﻿#include "TestTask.h"
+﻿#define _USE_MATH_DEFINES
+#include <cmath>
 
+#include "TestTask.h"
 /*-----------------------------------------------------------------------*/
 /*                     CLASS METHODS Location                            */
 /*-----------------------------------------------------------------------*/
-Location::Location(int InitX, int InitY)
+Location::Location(GLfloat InitX, GLfloat InitY)
 	: _x(InitX), _y(InitY)
 {}
 
-int Location::getX()
+GLfloat Location::getX()
 {
 	return _x;
 }
 
-int Location::getY()
+GLfloat Location::getY()
 {
 	return _y;
 }
@@ -31,16 +33,8 @@ void Rectangle::draw(const glfwm::WindowID id)
 		glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//glPointSize(10);
-		glLineWidth(_scale);
 		glColor3f(_red, _green, _blue);
-		//glBegin(GL_POLYGON);
-		//glVertex3f(_x, _y, 0.f);
 		const auto& [axisX, axisY] = _coords[0];
-		//glVertex3f(300, 300, 0.f);
-		//glRectf(0, 0, 300, 300);
-		//glEnd();
-
 		glBegin(GL_POLYGON);
 		glVertex2f(_x, _y);
 		glVertex2f(axisX, _y);
@@ -49,20 +43,58 @@ void Rectangle::draw(const glfwm::WindowID id)
 		glEnd();
 }
 
-void Rectangle::rotateShape(float angle)
+/*-----------------------------------------------------------------------*/
+/*                     CLASS METHODS Circle                              */
+/*-----------------------------------------------------------------------*/
+void Circle::draw(const glfwm::WindowID id)
 {
-	return;
+	const auto window = glfwm::Window::getWindow(id);
+	int width = 0, height = 0;
+	window->getSize(width, height);
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(_red, _green, _blue);
+	glBegin(GL_POLYGON);
+
+	for (size_t i = 0; i < 360; ++i)
+	{
+		auto theta = i * (M_PI / 180);
+		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
+	}
+	glEnd();
 }
 
-void Rectangle::moveTo(float offsetX, float offsetY)
+void Ring::draw(const glfwm::WindowID id)
 {
-	_x += offsetX;
-	_y += offsetY;
+	const auto window = glfwm::Window::getWindow(id);
+	int width = 0, height = 0;
+	window->getSize(width, height);
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(_red, _green, _blue);
+	glBegin(GL_POLYGON);
 
-	for (auto& [x, y] : _coords)
+	for (size_t i = 0; i < 360; ++i)
 	{
-		x += offsetX;
-		y += offsetY;
+		auto theta = i * (M_PI / 180);
+		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
 	}
-	return;
+	glEnd();
+	glBegin(GL_POLYGON);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	for (size_t i = 0; i < 360; ++i)
+	{
+		auto theta = i * (M_PI / 180);
+		glVertex2f(static_cast<GLfloat>(_x + (_radius - _ringWidth) * cos(theta)), 
+				  (static_cast<GLfloat>(_y + (_radius - _ringWidth) * sin(theta))));
+	}
+	glEnd();
 }
