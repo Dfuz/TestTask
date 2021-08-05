@@ -21,6 +21,16 @@ struct IShape
 };
 
 /// <summary>
+/// Struct-helper
+/// </summary>
+struct Colors
+{
+	GLfloat red = 0.f;
+	GLfloat green = 0.f;
+	GLfloat blue = 0.f;
+};
+
+/// <summary>
 /// Class-helper
 /// </summary>
 class Location
@@ -136,4 +146,14 @@ public:
 	{}
 	void setRingWidth(float ringwidth) { _ringWidth = ringwidth; }
 	void draw(const glfwm::WindowID id) override;
+	friend void prepareScene(const glfwm::WindowID&);
 };
+
+/// <summary>
+/// Helper function 
+/// </summary>
+void prepareScene
+(
+	const glfwm::WindowID&,
+	const Colors&
+);

@@ -24,23 +24,14 @@ GLfloat Location::getY()
 /*-----------------------------------------------------------------------*/
 void Rectangle::draw(const glfwm::WindowID id)
 {
-		const auto window = glfwm::Window::getWindow(id);
-		int width = 0, height = 0;
-		window->getSize(width, height);
-		glViewport(0, 0, width, height);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glColor3f(_red, _green, _blue);
-		const auto& [axisX, axisY] = _coords[0];
-		glBegin(GL_POLYGON);
-		glVertex2f(_x, _y);
-		glVertex2f(axisX, _y);
-		glVertex2f(axisX, axisY);
-		glVertex2f(_x, axisY);
-		glEnd();
+	prepareScene(id, { _red, _green, _blue });
+	const auto& [axisX, axisY] = _coords[0];
+	glBegin(GL_POLYGON);
+	glVertex2f(_x, _y);
+	glVertex2f(axisX, _y);
+	glVertex2f(axisX, axisY);
+	glVertex2f(_x, axisY);
+	glEnd();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -48,27 +39,50 @@ void Rectangle::draw(const glfwm::WindowID id)
 /*-----------------------------------------------------------------------*/
 void Circle::draw(const glfwm::WindowID id)
 {
-	const auto window = glfwm::Window::getWindow(id);
-	int width = 0, height = 0;
-	window->getSize(width, height);
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3f(_red, _green, _blue);
-	glBegin(GL_POLYGON);
+	prepareScene(id, { _red, _green, _blue });
+	const double RadiansConstant = M_PI / 180;
 
+	glBegin(GL_POLYGON);
 	for (size_t i = 0; i < 360; ++i)
 	{
-		auto theta = i * (M_PI / 180);
+		auto theta = i * RadiansConstant;
 		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
 	}
 	glEnd();
 }
 
 void Ring::draw(const glfwm::WindowID id)
+{
+	prepareScene(id, { _red, _green, _blue });
+
+	glBegin(GL_POLYGON);
+	const double RadiansConstant = M_PI / 180;
+	for (size_t i = 0; i < 360; ++i)
+	{
+		auto theta = i * RadiansConstant;
+		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
+	}
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	for (size_t i = 0; i < 360; ++i)
+	{
+		auto theta = i * RadiansConstant;
+		glVertex2f(static_cast<GLfloat>(_x + (_radius - _ringWidth) * cos(theta)), 
+				  (static_cast<GLfloat>(_y + (_radius - _ringWidth) * sin(theta))));
+	}
+	glEnd();
+}
+
+/*-----------------------------------------------------------------------*/
+/*                              HELPERS                                  */
+/*-----------------------------------------------------------------------*/
+void prepareScene
+(
+	const glfwm::WindowID& id, 
+	const Colors& colors
+)
 {
 	const auto window = glfwm::Window::getWindow(id);
 	int width = 0, height = 0;
@@ -79,22 +93,5 @@ void Ring::draw(const glfwm::WindowID id)
 	glOrtho(0.0, width, 0.0, height, 0.0, 1.0);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3f(_red, _green, _blue);
-	glBegin(GL_POLYGON);
-
-	for (size_t i = 0; i < 360; ++i)
-	{
-		auto theta = i * (M_PI / 180);
-		glVertex2f(static_cast<GLfloat>(_x + _radius * cos(theta)), (static_cast<GLfloat>(_y + _radius * sin(theta))));
-	}
-	glEnd();
-	glBegin(GL_POLYGON);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	for (size_t i = 0; i < 360; ++i)
-	{
-		auto theta = i * (M_PI / 180);
-		glVertex2f(static_cast<GLfloat>(_x + (_radius - _ringWidth) * cos(theta)), 
-				  (static_cast<GLfloat>(_y + (_radius - _ringWidth) * sin(theta))));
-	}
-	glEnd();
+	glColor3f(colors.red, colors.green, colors.blue);
 }
